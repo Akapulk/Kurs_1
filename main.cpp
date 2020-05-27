@@ -5,8 +5,12 @@
 #include <cstdlib>
 #include <algorithm>
 #include <time.h>
+
 using namespace std;
-int wins, flag;
+int wins, flag,i1,i2;
+char huc[20]="Match";
+
+//Игрок
 struct Player {
 	string name;
 	string country;
@@ -19,55 +23,75 @@ struct Player {
 		return in;
 	}
 };
+
+//паттерн "Наблюдатель"
 class Observer
 {
   public:
     virtual void update(int value, ofstream&) = 0;
 	virtual Player& get() = 0;
 };
+ 
+//Сама игра
 class Subject
 {
 	vector<Observer*> m_views;
 	ofstream out;
-	int num; 
+	int num; // количество игроков
 public:
-	Subject() { num = 0; } 
+
+	Subject() { num = 0; } // изначально количество 0
 	void attach(Observer *obs)
 	{
 		m_views.push_back(obs);
-		num++; 
+		num++; // увеличиваем на 1 каждый раз, как добавляется игрок
 	}
 	void play(int val)
 	{
-		out.open(to_string(rand()) + to_string(rand()) + ".txt");
+		int cs;
+		cout << "Хотите ли вы изменить имя фалйла для сохранеия результаьов (да-1/нет-0)" << endl;
+		cin >> cs;
+		if (cs == 1) {
+			cout << "Введите имя файла :";
+			cin >> huc;
+			cout << endl;
+		}
+		out.open(huc+to_string(rand()) + to_string(rand()) + ".txt");
 		notify();
 		for (int i = 0; i < val; ++i) {
 			//Играем
-			vector<int> chances; 
+			vector<int> chances; // массив с шансами на победу каждого игрока
 			int speed, luck;
-			for (int j = 0; j < num; ++j) 
+			for (int j = 0; j < num; ++j) // проходим по всем игрокам
 			{
-				speed = rand() % 11; 
-				luck = rand() % 11; 
-				chances.push_back(speed*luck); 
+				speed = rand() % 11; // скорость от 0 до 10
+				luck = rand() % 11; // удача от 0 до 10
+				chances.push_back(speed*luck); // шансы на победу = скорость*удача
+				out << "################################################################################################\n";
+				out << "Харроктиристики игроков игрок №" << j << "\n";
+				out << "Скорость " << speed << "\n";
+				out << "Удача " << luck << "\n";
+
 			}
-			int maxch = 0; 
-			int winner = 0; 
+			int maxch = 0; // максимальный шанс на победу
+			int winner = 0; // номер победившего игрока
 			for (int j = 0; j < num; ++j)
 			{
-				if (maxch < chances.at(j))
+				if (maxch < chances.at(j)) // если максимальный шанс меньше текущего
 				{
-					maxch = chances.at(j); 
-						winner = j; 
+					maxch = chances.at(j); // то текущий шанс делаем максимальным
+						winner = j; // и это победитель
 				}
 			}
 			for (int j = 0; j < num; ++j)
 			{
-				if (winner == j) 
-					(m_views.at(j))->get().wins += 1; 
+				if (winner == j) // если текущий игрок победил
+					(m_views.at(j))->get().wins += 1; // увеличиваем его счетчик побед
 				else
-					(m_views.at(j))->get().wins += 0; 
+					(m_views.at(j))->get().wins += 0; // иначе не увеличиваем
 			}
+			cout << "_________________________________________________________________________________________________" << endl;
+			out << "_________________________________________________________________________________________________" << "\n";
 			out << "Матч: " << i + 1 << "\n";
 			cout << endl << "Матч: " << i + 1 << endl;
 			cout << "В этом матче побеждает ";
@@ -90,6 +114,7 @@ public:
 	}
 };
 
+//Наблюдаем за всеми игроками
 class AllObserver : public Observer
 {
 	Player player;
@@ -106,7 +131,7 @@ public:
 	}
 };
  
-
+//За кем будем наблюдать
 class MainObserver: public Observer
 {
 	Player player; 
@@ -143,20 +168,22 @@ class MainObserver: public Observer
 int main()
 {
   setlocale(LC_ALL, "Russian");
+  system("color F0");
   srand(time(NULL));
   Subject subj;
   int game=0;
   int cnt;
-  int buff; 
-  ifstream fin("all.txt"); 
+  int buff; // буфер промежуточного хранения считываемого из файла текста
+  ifstream fin("all.txt"); // открыли файл для чтения
   ifstream in("all.txt");
   fin >> buff;
   in >> cnt;
   vector<Player> players(cnt);
+  //Считываем игроков из файла
   for (auto& p : players) {
 	  in >> p;
   }
-  cout << "Добавить игроков в базу? (1/0): ";
+  cout << "Добавить игроков в базу? (да-1/нет-0): ";
   char ch;
   cin >> ch;
   switch (ch)
@@ -187,7 +214,7 @@ int main()
   cout << "Игроки:" << endl;
   for (int i = 0; i < players.size(); ++i)
   {
-	  cout << players.at(i).name << endl;
+	  cout << i<<") "<<players.at(i).name << endl;
   }
   cout << "Введите номер игрока для наблюдения (от 0 до " << players.size() - 1 << ") : ";
   cin >> cnt;
@@ -207,13 +234,14 @@ int main()
   }
   wins = 0;
   flag = 0;
-  cout << "\nВведите количество проводимых матчей: "; 
+  cout << "\nВведите количество проводимых матчей (обычно их 5): "; 
   cin >> game;
   subj.play(game);
-  if (wins > 2)
+  cout << "Соотношение побед/поражениям "<< wins <<"/"<< game-wins << endl;
+  cout << "Итог: _________________________________________________________________________________________________" << endl;
+  if (wins > (game/2))
 	  cout << "Вы выиграли!" << endl;
   else
 	  cout << "Вы проиграли!" << endl;
-
   system("pause>>void");
 }
