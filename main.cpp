@@ -9,6 +9,8 @@
 using namespace std;
 int wins, flag,i1,i2;
 char huc[20]="Match";
+
+//Игрок
 struct Player {
 	string name;
 	string country;
@@ -21,6 +23,8 @@ struct Player {
 		return in;
 	}
 };
+
+//паттерн "Наблюдатель"
 class Observer
 {
   public:
@@ -69,22 +73,22 @@ public:
 				out << "Удача " << luck << "\n";
 
 			}
-			int maxch = 0; 
-			int winner = 0; 
+			int maxch = 0; // максимальный шанс на победу
+			int winner = 0; // номер победившего игрока
 			for (int j = 0; j < num; ++j)
 			{
-				if (maxch < chances.at(j)) 
+				if (maxch < chances.at(j)) // если максимальный шанс меньше текущего
 				{
-					maxch = chances.at(j); 
-						winner = j;
+					maxch = chances.at(j); // то текущий шанс делаем максимальным
+						winner = j; // и это победитель
 				}
 			}
 			for (int j = 0; j < num; ++j)
 			{
-				if (winner == j) 
-					(m_views.at(j))->get().wins += 1; 
+				if (winner == j) // если текущий игрок победил
+					(m_views.at(j))->get().wins += 1; // увеличиваем его счетчик побед
 				else
-					(m_views.at(j))->get().wins += 0; 
+					(m_views.at(j))->get().wins += 0; // иначе не увеличиваем
 			}
 			cout << "_________________________________________________________________________________________________" << endl;
 			out << "_________________________________________________________________________________________________" << "\n";
@@ -97,6 +101,7 @@ public:
 			
 		}
 	}
+	//Оповещаем всех наблюдателей
 	void notify()
 	{
 		if (flag == 0)
@@ -108,6 +113,8 @@ public:
 		}
 	}
 };
+
+//Наблюдаем за всеми игроками
 class AllObserver : public Observer
 {
 	Player player;
@@ -123,7 +130,8 @@ public:
 		out << player.name  << "\t\t" << player.wins << "\t";
 	}
 };
-
+ 
+//За кем будем наблюдать
 class MainObserver: public Observer
 {
 	Player player; 
@@ -165,12 +173,13 @@ int main()
   Subject subj;
   int game=0;
   int cnt;
-  int buff; 
-  ifstream fin("all.txt"); 
+  int buff; // буфер промежуточного хранения считываемого из файла текста
+  ifstream fin("all.txt"); // открыли файл для чтения
   ifstream in("all.txt");
   fin >> buff;
   in >> cnt;
   vector<Player> players(cnt);
+  //Считываем игроков из файла
   for (auto& p : players) {
 	  in >> p;
   }
