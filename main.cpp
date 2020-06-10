@@ -5,12 +5,11 @@
 #include <cstdlib>
 #include <algorithm>
 #include <time.h>
+#include <windows.h>
 
 using namespace std;
 int wins, flag,i1,i2;
 char huc[20]="Match";
-
-//Игрок
 struct Player {
 	string name;
 	string country;
@@ -24,7 +23,6 @@ struct Player {
 	}
 };
 
-//паттерн "Наблюдатель"
 class Observer
 {
   public:
@@ -32,7 +30,6 @@ class Observer
 	virtual Player& get() = 0;
 };
  
-//Сама игра
 class Subject
 {
 	vector<Observer*> m_views;
@@ -40,11 +37,11 @@ class Subject
 	int num; // количество игроков
 public:
 
-	Subject() { num = 0; } // изначально количество 0
+	Subject() { num = 0; } 
 	void attach(Observer *obs)
 	{
 		m_views.push_back(obs);
-		num++; // увеличиваем на 1 каждый раз, как добавляется игрок
+		num++; 
 	}
 	void play(int val)
 	{
@@ -101,7 +98,7 @@ public:
 			
 		}
 	}
-	//Оповещаем всех наблюдателей
+
 	void notify()
 	{
 		if (flag == 0)
@@ -114,7 +111,6 @@ public:
 	}
 };
 
-//Наблюдаем за всеми игроками
 class AllObserver : public Observer
 {
 	Player player;
@@ -130,8 +126,6 @@ public:
 		out << player.name  << "\t\t" << player.wins << "\t";
 	}
 };
- 
-//За кем будем наблюдать
 class MainObserver: public Observer
 {
 	Player player; 
@@ -171,6 +165,11 @@ int main()
   system("color F0");
   srand(time(NULL));
   Subject subj;
+  cout << "\t\t\t\t\t BIG TENNIS \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"<<endl;
+  cout << "\t\t\t\t\t\t\t\t\t\tDevolopmet by Sedov Vadim GR.1742" << endl;
+  Sleep(1000);
+  system("cls");
+  system("color F0");
   int game=0;
   int cnt;
   int buff; // буфер промежуточного хранения считываемого из файла текста
@@ -179,7 +178,6 @@ int main()
   fin >> buff;
   in >> cnt;
   vector<Player> players(cnt);
-  //Считываем игроков из файла
   for (auto& p : players) {
 	  in >> p;
   }
